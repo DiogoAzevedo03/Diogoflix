@@ -1,4 +1,3 @@
-// server.js - Main backend entry point
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -15,14 +14,18 @@ app.use(express.json());
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
 
 // Routes
-app.use('/api/movies', movieRoutes);
+app.use('/api', movieRoutes);
 
-// Test route
-app.get('/', (req, res) => {
-  res.send('Movie API is running');
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
 });
 
 // Start server

@@ -1,7 +1,7 @@
 {
-  "name": "mflix-api",
+  "name": "mflix-backend",
   "version": "1.0.0",
-  "description": "MongoDB movie database API",
+  "description": "MFLIX Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,7 +11,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mflix-api": "file:",
+    "mflix-backend": "file:",
     "mongoose": "^7.0.3"
   },
   "devDependencies": {

@@ -1,120 +1,147 @@
-// src/components/MovieDetail.js
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { fetchMovieById } from '../services/api';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { fetchMovieById, deleteMovie } from '../services/api';
 import CommentList from './CommentList';
 
-const MovieDetail = () => {
+function MovieDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
-  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const defaultPoster = 'https://via.placeholder.com/300x450?text=No+Image';
 
   useEffect(() => {
-    const fetchData = async () => {
+    const loadMovie = async () => {
       try {
         setLoading(true);
         const data = await fetchMovieById(id);
-        setMovie(data.movie);
-        setComments(data.comments);
+        setMovie(data);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch movie details. Please try again later.');
+        setError('Failed to load movie details');
         setLoading(false);
+        console.error(err);
       }
     };
 
-    fetchData();
+    loadMovie();
   }, [id]);
 
-  if (loading) {
-    return <div className="loading">Loading movie details...</div>;
-  }
+  const handleDeleteMovie = async () => {
+    if (window.confirm('Are you sure you want to delete this movie?')) {
+      try {
+        await deleteMovie(id);
+        navigate('/');
+      } catch (err) {
+        setError('Failed to delete movie');
+        console.error(err);
+      }
+    }
+  };
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
+  if (loading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">{error}</div>;
+  if (!movie) return <div className="error">Movie not found</div>;
 
-  if (!movie) {
-    return <div className="error">Movie not found</div>;
-  }
-
-  const defaultPoster = 'https://via.placeholder.com/300x450?text=No+Poster';
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Unknown';
+    return new Date(dateString).toLocaleDateString();
+  };
 
   return (
-    <div>
-      <Link to="/" className="back-button">← Back to Movies</Link>
-
-      <div className="movie-details">
+    <div className="movie-detail-container">
+      <div className="movie-detail">
         <div className="movie-header">
-          <img
-            src={movie.poster || defaultPoster}
-            alt={`${movie.title} poster`}
-            className="movie-poster-large"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = defaultPoster;
-            }}
-          />
+          <h1>{movie.title}</h1>
+          <div className="movie-actions">
+            <Link to="/" className="btn">Back to Movies</Link>
+            <Link to={`/edit-movie/${movie._id}`} className="btn btn-edit">Edit</Link>
+            <button onClick={handleDeleteMovie} className="btn btn-delete">Delete</button>
+          </div>
+        </div>
 
-          <div className="movie-header-info">
-            <h1>{movie.title} {movie.year ? `(${movie.year})` : ''}</h1>
+        <div className="movie-content">
+          <div className="movie-poster-container">
+            <img 
+              src={movie.poster || defaultPoster} 
+              alt={movie.title} 
+              className="movie-detail-poster"
+              onError={(e) => {e.target.src = defaultPoster}}
+            />
+          </div>
 
-            {movie.imdb && movie.imdb.rating && (
-              <div className="movie-metadata">
-                <strong>Rating:</strong> ★ {movie.imdb.rating.toFixed(1)}
-                {movie.imdb.votes && ` (${movie.imdb.votes.toLocaleString()} votes)`}
-              </div>
-            )}
-
+          <div className="movie-info-detail">
+            <div className="info-row">
+              <span className="info-label">Released:</span>
+              <span>{formatDate(movie.released)}</span>
+            </div>
+            
             {movie.runtime && (
-              <div className="movie-metadata">
-                <strong>Runtime:</strong> {movie.runtime} minutes
+              <div className="info-row">
+                <span className="info-label">Runtime:</span>
+                <span>{movie.runtime} minutes</span>
               </div>
             )}
-
+            
+            {movie.rated && (
+              <div className="info-row">
+                <span className="info-label">Rated:</span>
+                <span>{movie.rated}</span>
+              </div>
+            )}
+            
             {movie.genres && movie.genres.length > 0 && (
-              <div className="movie-metadata">
-                <strong>Genres:</strong> {movie.genres.join(', ')}
+              <div className="info-row">
+                <span className="info-label">Genres:</span>
+                <span>{movie.genres.join(', ')}</span>
               </div>
             )}
-
+            
             {movie.directors && movie.directors.length > 0 && (
-              <div className="movie-metadata">
-                <strong>Director{movie.directors.length > 1 ? 's' : ''}:</strong> {movie.directors.join(', ')}
+              <div className="info-row">
+                <span className="info-label">Directors:</span>
+                <span>{movie.directors.join(', ')}</span>
               </div>
             )}
-
+            
             {movie.cast && movie.cast.length > 0 && (
-              <div className="movie-metadata">
-                <strong>Cast:</strong> {movie.cast.slice(0, 5).join(', ')}
-                {movie.cast.length > 5 ? '...' : ''}
+              <div className="info-row">
+                <span className="info-label">Cast:</span>
+                <span>{movie.cast.join(', ')}</span>
               </div>
             )}
-
+            
             {movie.countries && movie.countries.length > 0 && (
-              <div className="movie-metadata">
-                <strong>Countries:</strong> {movie.countries.join(', ')}
+              <div className="info-row">
+                <span className="info-label">Countries:</span>
+                <span>{movie.countries.join(', ')}</span>
+              </div>
+            )}
+            
+            {movie.plot && (
+              <div className="plot-section">
+                <h3>Plot</h3>
+                <p>{movie.plot}</p>
+              </div>
+            )}
+            
+            {movie.fullplot && movie.fullplot !== movie.plot && (
+              <div className="plot-section">
+                <h3>Full Plot</h3>
+                <p>{movie.fullplot}</p>
               </div>
             )}
           </div>
         </div>
+      </div>
 
-        {movie.plot && (
-          <div>
-            <h2>Plot</h2>
-            <p>{movie.fullplot || movie.plot}</p>
-          </div>
-        )}
-
-        <div className="comments-section">
-          <h2>Comments ({comments.length})</h2>
-          <CommentList comments={comments} />
-        </div>
+      <div className="comments-section">
+        <h2>Comments</h2>
+        <CommentList movieId={id} />
       </div>
     </div>
   );
-};
+}
 
 export default MovieDetail;
