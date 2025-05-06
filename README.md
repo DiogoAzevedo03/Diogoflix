@@ -28,10 +28,15 @@ mflix-project/
     │   └── index.html
     ├── src/
     │   ├── components/  # React components
+    │   │   ├── CommentForm.js
+    │   │   ├── CommentList.js
+    │   │   ├── Moviecard.js
+    │   │   ├── MovieForm.js
     │   │   ├── MovieList.js
-    │   │   ├── MovieCard.js
+    │   │   ├── MovieSearch.js
+    │   │   ├── navbar.js
     │   │   ├── MovieDetail.js
-    │   │   └── CommentList.js
+    │   │   └── SearchResultsPage.js
     │   ├── services/    # API services
     │   │   └── api.js
     │   ├── App.js       # Main App component
