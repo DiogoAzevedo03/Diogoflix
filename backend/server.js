@@ -1,20 +1,35 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');  // Importando o CORS
+const cors = require('cors');
 const movieRoutes = require('./routes/movieRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Configuração do CORS
-const allowedOrigins = ['https://diogoflix-frontend.onrender.com'];  // URL do seu frontend no Render
+// Improved CORS configuration for Render deployment
+const allowedOrigins = [
+  'https://diogoflix-frontend.onrender.com',
+  'http://localhost:3000' // Allow local development
+];
+
 const corsOptions = {
-  origin: allowedOrigins,  // Permitir apenas o frontend específico
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Métodos permitidos
-  credentials: true,  // Permite o envio de cookies ou credenciais
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+  optionsSuccessStatus: 200
 };
-app.use(cors(corsOptions));  // Usando o middleware CORS com as opções
+
+app.use(cors(corsOptions));
 
 // Middleware
 app.use(express.json());
@@ -29,6 +44,11 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Rotas
 app.use('/api', movieRoutes);
+
+// Root endpoint for health check
+app.get('/', (req, res) => {
+  res.send('DiogoFlix API is running!');
+});
 
 // Middleware de tratamento de erros
 app.use((err, req, res, next) => {

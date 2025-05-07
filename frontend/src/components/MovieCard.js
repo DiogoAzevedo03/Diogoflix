@@ -2,7 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function MovieCard({ movie, onDelete }) {
-  const defaultPoster = 'https://via.placeholder.com/300x450?text=No+Image';
+  // Define an inline SVG placeholder - this will work without external dependencies
+  const placeholderSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='450' viewBox='0 0 300 450'%3E%3Crect width='300' height='450' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' text-anchor='middle' dominant-baseline='middle' fill='%23999999'%3ENo Image%3C/text%3E%3C/svg%3E`;
+
+  // Reliable alternate public placeholder service (if you prefer external service)
+  // const defaultPoster = 'https://placehold.co/300x450?text=No+Image';
+  
+  // Use the SVG placeholder
+  const defaultPoster = placeholderSvg;
 
   return (
     <div className="movie-card">
