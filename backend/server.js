@@ -32,3 +32,15 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+const cors = require('cors');
+
+const allowedOrigins = ['https://diogoflix-frontend.onrender.com'];
+
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));  // Usando as configurações de CORS
