@@ -1,14 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
+const cors = require('cors');  // Este é o único lugar onde você precisa importar o cors
 const movieRoutes = require('./routes/movieRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors());  // Aqui você pode usar o cors sem duplicação
 app.use(express.json());
 
 // Connect to MongoDB
@@ -32,16 +32,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-const cors = require('cors');
-
-const allowedOrigins = ['https://diogoflix-frontend.onrender.com'];
-
-const corsOptions = {
-  origin: ['https://diogoflix-frontend.onrender.com', 'http://localhost:3000'], // Adicione localhost para testes locais
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-};
-
-
-app.use(cors(corsOptions));  // Usando as configurações de CORS
