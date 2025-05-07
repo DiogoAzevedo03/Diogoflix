@@ -38,9 +38,10 @@ const cors = require('cors');
 const allowedOrigins = ['https://diogoflix-frontend.onrender.com'];
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: ['https://diogoflix-frontend.onrender.com', 'http://localhost:3000'], // Adicione localhost para testes locais
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 };
+
 
 app.use(cors(corsOptions));  // Usando as configurações de CORS
